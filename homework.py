@@ -1,16 +1,14 @@
+from dataclasses import dataclass
+
+
+@dataclass
 class InfoMessage:
     """Информационное сообщение о тренировке."""
-    def __init__(self,
-                 training_type: str,
-                 duration: float,
-                 distance: float,
-                 speed: float,
-                 calories: float) -> None:
-        self.training_type = training_type
-        self.duration = duration
-        self.distance = distance
-        self.speed = speed
-        self.calories = calories
+    training_type: str
+    duration: float
+    distance: float
+    speed: float
+    calories: float
 
     def get_message(self) -> str:
         return (f'Тип тренировки: {self.training_type}; '
@@ -24,6 +22,7 @@ class Training:
     """Базовый класс тренировки."""
     LEN_STEP: float = 0.65
     M_IN_KM: int = 1000
+    minutes: int = 60
 
     def __init__(self,
                  action: int,
@@ -46,7 +45,7 @@ class Training:
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
-        pass
+        raise NotImplementedError('Метод не реализован')
 
     def show_training_info(self) -> InfoMessage:
         """Вернуть информационное сообщение о выполненной тренировке."""
@@ -63,8 +62,13 @@ class Running(Training):
     def get_spent_calories(self) -> float:
         coeff_calorie_1: int = 18
         coeff_calorie_2: int = 20
-        calories = ((coeff_calorie_1 * self.get_mean_speed() - coeff_calorie_2)
-                    * self.weight / self.M_IN_KM * self.duration * 60)
+        calories = (
+            (coeff_calorie_1
+             * self.get_mean_speed() - coeff_calorie_2
+             )
+            * self.weight / self.M_IN_KM
+            * self.duration * self.minutes
+        )
         return calories
 
 
@@ -78,11 +82,14 @@ class SportsWalking(Training):
         coeff_calorie_3: float = 0.035
         coeff_calorie_4: float = 0.029
         coeff_calorie_5: int = 2
-        minutes = 60
-        calories = ((coeff_calorie_3 * self.weight + (self.get_mean_speed()
-                    ** coeff_calorie_5 // self.height) * coeff_calorie_4
-                    * self.weight)
-                    * (self.duration * minutes))
+        calories = (
+            (
+                coeff_calorie_3 * self.weight
+                + (
+                    self.get_mean_speed() ** coeff_calorie_5 // self.height
+                ) * coeff_calorie_4 * self.weight
+            ) * (self.duration * self.minutes)
+        )
         return calories
 
 
@@ -113,8 +120,12 @@ class Swimming(Training):
     def get_spent_calories(self) -> float:
         coeff_calorie_6 = 1.1
         coeff_calorie_7 = 2
-        calories = ((self.get_mean_speed() + coeff_calorie_6) * coeff_calorie_7
-                    * self.weight)
+        calories = (
+            (self.get_mean_speed()
+                + coeff_calorie_6
+             ) * coeff_calorie_7
+               * self.weight
+        )
         return calories
 
 
@@ -123,7 +134,23 @@ def read_package(workout_type: str, data: list) -> Training:
     dictionary = {'SWM': Swimming,
                   'RUN': Running,
                   'WLK': SportsWalking}
-    return dictionary[workout_type](*data)
+    if workout_type in dictionary:
+        return dictionary[workout_type](*data)
+    else:
+        try:
+            return dictionary[workout_type](*data)
+        except KeyError:
+            print('Данный тип тренировок еще не добавлен '
+                  'в наш фитнес-трекер :(')
+        finally:
+            return ('Поручик Ржевский проснулся и обнаружил на подушке '
+                    'малиновую косточку. '
+                    'Он позвал служанку и велел выяснить, '
+                    'откуда она взялась. '
+                    'Служанка пришла и напомнила, '
+                    'что он её сам только что позвал. '
+                    'P.S. Пётр, спасибо за замечания по коду!'
+                    )
 
 
 def main(training: Training) -> None:
@@ -141,4 +168,13 @@ if __name__ == '__main__':
 
     for workout_type, data in packages:
         training = read_package(workout_type, data)
+        if training == ('Поручик Ржевский проснулся и обнаружил на подушке '
+                        'малиновую косточку. '
+                        'Он позвал служанку и велел выяснить, '
+                        'откуда она взялась. '
+                        'Служанка пришла и напомнила, '
+                        'что он её сам только что позвал. '
+                        'P.S. Пётр, спасибо за замечания по коду!'
+                        ):
+            continue
         main(training)
