@@ -22,7 +22,7 @@ class Training:
     """Базовый класс тренировки."""
     LEN_STEP: float = 0.65
     M_IN_KM: int = 1000
-    minutes: int = 60
+    MIN_IN_H: int = 60
 
     def __init__(self,
                  action: int,
@@ -66,8 +66,7 @@ class Running(Training):
             (coeff_calorie_1
              * self.get_mean_speed() - coeff_calorie_2
              )
-            * self.weight / self.M_IN_KM
-            * self.duration * self.minutes
+            * self.weight / self.M_IN_KM * self.duration * self.MIN_IN_H
         )
         return calories
 
@@ -88,7 +87,7 @@ class SportsWalking(Training):
                 + (
                     self.get_mean_speed() ** coeff_calorie_5 // self.height
                 ) * coeff_calorie_4 * self.weight
-            ) * (self.duration * self.minutes)
+            ) * (self.duration * self.MIN_IN_H)
         )
         return calories
 
@@ -123,8 +122,8 @@ class Swimming(Training):
         calories = (
             (self.get_mean_speed()
                 + coeff_calorie_6
-             ) * coeff_calorie_7
-               * self.weight
+             )
+            * coeff_calorie_7 * self.weight
         )
         return calories
 
@@ -142,7 +141,6 @@ def read_package(workout_type: str, data: list) -> Training:
         except KeyError:
             print('Данный тип тренировок еще не добавлен '
                   'в наш фитнес-трекер :(')
-        finally:
             return ('Поручик Ржевский проснулся и обнаружил на подушке '
                     'малиновую косточку. '
                     'Он позвал служанку и велел выяснить, '
