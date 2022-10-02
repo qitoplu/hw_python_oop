@@ -133,22 +133,19 @@ def read_package(workout_type: str, data: list) -> Training:
     dictionary = {'SWM': Swimming,
                   'RUN': Running,
                   'WLK': SportsWalking}
-    if workout_type in dictionary:
+    try:
         return dictionary[workout_type](*data)
-    else:
-        try:
-            return dictionary[workout_type](*data)
-        except KeyError:
-            print('Данный тип тренировок еще не добавлен '
-                  'в наш фитнес-трекер :(')
-            return ('Поручик Ржевский проснулся и обнаружил на подушке '
-                    'малиновую косточку. '
-                    'Он позвал служанку и велел выяснить, '
-                    'откуда она взялась. '
-                    'Служанка пришла и напомнила, '
-                    'что он её сам только что позвал. '
-                    'P.S. Пётр, спасибо за замечания по коду!'
-                    )
+    except KeyError:
+        print('Данный тип тренировок еще не добавлен '
+              'в наш фитнес-трекер :(')
+        return ('Поручик Ржевский проснулся и обнаружил на подушке '
+                'малиновую косточку. '
+                'Он позвал служанку и велел выяснить, '
+                'откуда она взялась. '
+                'Служанка пришла и напомнила, '
+                'что он её сам только что позвал. '
+                'P.S. Пётр, спасибо за замечания по коду!'
+                )
 
 
 def main(training: Training) -> None:
